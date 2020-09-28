@@ -19,7 +19,7 @@ namespace CeChat.App
             InitializeComponent();
             this.ChatRoomService = chatRoomService;
             this.UserName = userName;
-            this.Init();
+            this.RefreshTimer.Start();
         }
 
         public void Init()
@@ -50,7 +50,11 @@ namespace CeChat.App
             messageInfo.MsgContent = message;
             this.ChatRoomService.ReceivingMessage(messageInfo);
             this.txtMessage.Text = string.Empty;
-            var messageInfos = this.ChatRoomService.GetMessages();
+        }
+
+        private void RefreshTimer_Tick(object sender, EventArgs e)
+        {
+            this.Init();
         }
     }
 }

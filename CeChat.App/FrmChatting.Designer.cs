@@ -28,10 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.txtMessages = new System.Windows.Forms.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.txtMessage = new System.Windows.Forms.TextBox();
             this.btnSend = new System.Windows.Forms.Button();
+            this.RefreshTimer = new System.Windows.Forms.Timer(this.components);
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -75,6 +77,11 @@
             this.btnSend.UseVisualStyleBackColor = true;
             this.btnSend.Click += new System.EventHandler(this.BtnSend_Click);
             // 
+            // RefreshTimer
+            // 
+            this.RefreshTimer.Interval = 1000;
+            this.RefreshTimer.Tick += new System.EventHandler(this.RefreshTimer_Tick);
+            // 
             // FrmChatting
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -97,5 +104,6 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.TextBox txtMessage;
         private System.Windows.Forms.Button btnSend;
+        private System.Windows.Forms.Timer RefreshTimer;
     }
 }

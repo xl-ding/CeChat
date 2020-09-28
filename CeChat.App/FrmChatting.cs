@@ -48,7 +48,7 @@ namespace CeChat.App
             messageInfo.UserName = this.UserName;
             messageInfo.MessageTime = DateTime.Now;
             messageInfo.MsgContent = message;
-            this.ChatRoomService.SendMessage(messageInfo);
+            this.ChatRoomService.ReceivingMessage(messageInfo);
             this.txtMessage.Text = string.Empty;
             var messageInfos = this.ChatRoomService.GetMessages();
         }

@@ -48,7 +48,7 @@ namespace CeChat.Host
         /// 发送消息
         /// </summary>
         /// <param name="message"></param>
-        public void SendMessage(MessageInfo message)
+        public void ReceivingMessage(MessageInfo message)
         {
             this.MessageList.Add(message);
         }

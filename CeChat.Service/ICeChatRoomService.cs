@@ -11,7 +11,7 @@ namespace CeChat.Service
 
         void Leave(string userName);
 
-        void SendMessage(MessageInfo messageInfo);
+        void ReceivingMessage(MessageInfo messageInfo);
 
         IEnumerable<MessageInfo> GetMessages();
     }

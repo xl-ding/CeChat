@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows.Forms;
 using CeChat.Service;
 
@@ -27,7 +26,16 @@ namespace CeChat.App
             this.CeChatRoomService.Join(userName);
             FrmChatting frmChatting = new FrmChatting(this.CeChatRoomService, userName);
             frmChatting.ShowDialog();
-            this.Close();
+            frmChatting.ShowDialog();
+            this.Dispose();
+        }
+
+        private void TxtUserName_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                this.BtnLogin_Click(sender, e);
+            }
         }
     }
 }

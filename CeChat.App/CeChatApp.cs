@@ -25,9 +25,10 @@ namespace CeChat.App
 
             this.CeChatRoomService.Join(userName);
             FrmChatting frmChatting = new FrmChatting(this.CeChatRoomService, userName);
-            frmChatting.ShowDialog();
-            frmChatting.ShowDialog();
-            this.Dispose();
+            this.Visible = false;
+            //frmChatting.ShowDialog();
+            frmChatting.Show();
+            //this.Dispose();
         }
 
         private void TxtUserName_KeyDown(object sender, KeyEventArgs e)

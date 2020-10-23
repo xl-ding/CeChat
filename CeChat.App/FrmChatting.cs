@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Windows.Forms;
 using CeChat.Model;
@@ -8,6 +10,8 @@ namespace CeChat.App
 {
     public partial class FrmChatting : Form
     {
+        public delegate IEnumerable<MessageInfo> AsyncRefresh();
+
         public string UserName { get; set; }
 
         public ICeChatRoomService ChatRoomService { get; set; }
@@ -22,16 +26,34 @@ namespace CeChat.App
 
         public void Init()
         {
-            var messageInfos = this.ChatRoomService.GetMessages();
-            StringBuilder strText = new StringBuilder();
-            foreach (var message in messageInfos)
-            {
-                strText.AppendLine(string.Format("{0}  {1} 说:", message.UserName, message.MessageTime));
-                strText.AppendLine("    " + message.MsgContent);
-                strText.AppendLine();
-            }
+            AsyncRefresh asyncrefresh = new AsyncRefresh(ChatRoomService.GetMessages);
+            asyncrefresh.BeginInvoke(CallBack, null);
+            System.Threading.Thread.Sleep(3000);
+            //var messageInfos = this.ChatRoomService.GetMessages();
+            //StringBuilder strText = new StringBuilder();
+            //foreach (var message in messageInfos)
+            //{
+            //    strText.AppendLine(string.Format("{0}  {1} 说:", message.UserName, message.MessageTime));
+            //    strText.AppendLine("    " + message.MsgContent);
+            //    strText.AppendLine();
+            //}
 
-            this.txtMessages.Text = strText.ToString();
+            //if (this.txtMessages.InvokeRequired)
+            //{
+            //    while (!this.txtMessages.IsHandleCreated)
+            //    {
+            //        if (this.txtMessages.Disposing||this.txtMessages.IsDisposed)
+            //        {
+            //            return;
+            //        }
+            //        SetTextCallback
+            //    }
+            //    this.txtMessages.Text = strText.ToString();
+            //}
+            //else
+            //{
+            //    this.txtMessages.Text = strText.ToString();
+            //}
         }
 
         private void BtnSend_Click(object sender, EventArgs e)
@@ -52,7 +74,26 @@ namespace CeChat.App
 
         private void RefreshTimer_Tick(object sender, EventArgs e)
         {
-            this.Init();
+            AsyncRefresh asyncrefresh = new AsyncRefresh(ChatRoomService.GetMessages);
+            asyncrefresh.BeginInvoke(CallBack, null);
+        }
+
+        public void CallBack(IAsyncResult result)
+        {
+            //AsyncRefresh asyncRefresh = result.AsyncState as AsyncRefresh;这一句和下面两句作用一致
+            AsyncResult asyncResult = result as AsyncResult;
+            AsyncRefresh asyncRefresh = asyncResult.AsyncDelegate as AsyncRefresh;
+
+            var messageInfos = asyncRefresh.EndInvoke(result);
+            StringBuilder strText = new StringBuilder();
+            foreach (var message in messageInfos)
+            {
+                strText.AppendLine(string.Format("{0}  {1} 说:", message.UserName, message.MessageTime));
+                strText.AppendLine("    " + message.MsgContent);
+                strText.AppendLine();
+            }
+
+            this.txtMessages.Text = strText.ToString();
         }
 
         private void TxtMessage_KeyDown(object sender, KeyEventArgs e)

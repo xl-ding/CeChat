@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using CeChat.Model;
 using CeChat.Service;
 
@@ -59,6 +60,7 @@ namespace CeChat.Host
         /// <returns></returns>
         public IEnumerable<MessageInfo> GetMessages()
         {
+            //Thread.Sleep(2000);
             return this.MessageList;
         }
     }

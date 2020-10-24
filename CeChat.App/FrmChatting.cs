@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows.Forms;
 using CeChat.Model;
 using CeChat.Service;
+using System.Threading.Tasks;
 
 namespace CeChat.App
 {
@@ -26,34 +27,16 @@ namespace CeChat.App
 
         public void Init()
         {
-            AsyncRefresh asyncrefresh = new AsyncRefresh(ChatRoomService.GetMessages);
-            asyncrefresh.BeginInvoke(CallBack, null);
-            System.Threading.Thread.Sleep(3000);
-            //var messageInfos = this.ChatRoomService.GetMessages();
-            //StringBuilder strText = new StringBuilder();
-            //foreach (var message in messageInfos)
-            //{
-            //    strText.AppendLine(string.Format("{0}  {1} 说:", message.UserName, message.MessageTime));
-            //    strText.AppendLine("    " + message.MsgContent);
-            //    strText.AppendLine();
-            //}
+            var messageInfos = this.ChatRoomService.GetMessages();
+            StringBuilder strText = new StringBuilder();
+            foreach (var message in messageInfos)
+            {
+                strText.AppendLine(string.Format("{0}  {1} 说:", message.UserName, message.MessageTime));
+                strText.AppendLine("    " + message.MsgContent);
+                strText.AppendLine();
+            }
 
-            //if (this.txtMessages.InvokeRequired)
-            //{
-            //    while (!this.txtMessages.IsHandleCreated)
-            //    {
-            //        if (this.txtMessages.Disposing||this.txtMessages.IsDisposed)
-            //        {
-            //            return;
-            //        }
-            //        SetTextCallback
-            //    }
-            //    this.txtMessages.Text = strText.ToString();
-            //}
-            //else
-            //{
-            //    this.txtMessages.Text = strText.ToString();
-            //}
+            this.txtMessages.Text = strText.ToString();
         }
 
         private void BtnSend_Click(object sender, EventArgs e)
@@ -62,6 +45,7 @@ namespace CeChat.App
             if (string.IsNullOrWhiteSpace(message))
             {
                 MessageBox.Show("发送内容不能为空!", "提示", MessageBoxButtons.OK);
+                return;
             }
 
             MessageInfo messageInfo = new MessageInfo();
@@ -72,19 +56,15 @@ namespace CeChat.App
             this.txtMessage.Text = string.Empty;
         }
 
-        private void RefreshTimer_Tick(object sender, EventArgs e)
+        private async void RefreshTimer_Tick(object sender, EventArgs e)
         {
-            AsyncRefresh asyncrefresh = new AsyncRefresh(ChatRoomService.GetMessages);
-            asyncrefresh.BeginInvoke(CallBack, null);
-        }
+            AsyncRefresh asyncrefresh = new AsyncRefresh(ChatRoomService.GetMessages); // 1/2
 
-        public void CallBack(IAsyncResult result)
-        {
-            //AsyncRefresh asyncRefresh = result.AsyncState as AsyncRefresh;这一句和下面两句作用一致
-            AsyncResult asyncResult = result as AsyncResult;
-            AsyncRefresh asyncRefresh = asyncResult.AsyncDelegate as AsyncRefresh;
+            //asyncrefresh.BeginInvoke(CallBack, null); // 1.AMP
 
-            var messageInfos = asyncRefresh.EndInvoke(result);
+            // 2.TAP
+            IEnumerable<MessageInfo> messageInfos = await Task.Factory.FromAsync(asyncrefresh.BeginInvoke, asyncrefresh.EndInvoke, null);
+
             StringBuilder strText = new StringBuilder();
             foreach (var message in messageInfos)
             {
@@ -94,6 +74,26 @@ namespace CeChat.App
             }
 
             this.txtMessages.Text = strText.ToString();
+        }
+
+        public void CallBack(IAsyncResult result)
+        {
+            //AsyncRefresh asyncRefresh = result.AsyncState as AsyncRefresh;这一句和下面两句作用一致
+            AsyncResult asyncResult = result as AsyncResult;
+            AsyncRefresh asyncRefresh = asyncResult.AsyncDelegate as AsyncRefresh;
+
+            var messageInfos = asyncRefresh.EndInvoke(result);
+
+            StringBuilder strText = new StringBuilder();
+            foreach (var message in messageInfos)
+            {
+                strText.AppendLine(string.Format("{0}  {1} 说:", message.UserName, message.MessageTime));
+                strText.AppendLine("    " + message.MsgContent);
+                strText.AppendLine();
+            }
+
+            Action action = () => { this.txtMessages.Text = strText.ToString(); };
+            this.txtMessages.Invoke(action);
         }
 
         private void TxtMessage_KeyDown(object sender, KeyEventArgs e)

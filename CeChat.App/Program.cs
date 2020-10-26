@@ -1,9 +1,9 @@
-﻿using CeChat.Service;
-using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Windows.Forms;
+using CeChat.Service;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CeChat.App
 {

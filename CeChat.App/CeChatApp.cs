@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using CeChat.Service;
 
@@ -8,13 +9,19 @@ namespace CeChat.App
     {
         public ICeChatRoomService CeChatRoomService { get; }
 
+        /// <summary>
+        /// 异步加入
+        /// </summary>
+        /// <param name="userName">用户名</param>
+        public delegate void AsyncJoin(string userName);
+
         public CeChatApp(ICeChatRoomService ceChatRoomService)
         {
             InitializeComponent();
             this.CeChatRoomService = ceChatRoomService;
         }
 
-        private void BtnLogin_Click(object sender, EventArgs e)
+        private async void BtnLogin_Click(object sender, EventArgs e)
         {
             string userName = this.txtUserName.Text.Trim();
             if (string.IsNullOrWhiteSpace(userName))
@@ -23,9 +30,12 @@ namespace CeChat.App
                 return;
             }
 
-            this.CeChatRoomService.Join(userName);
+            AsyncJoin asyncJoin = new AsyncJoin(this.CeChatRoomService.Join);
+            await Task.Factory.FromAsync(asyncJoin.BeginInvoke(userName, null, null), asyncJoin.EndInvoke);
+            //this.CeChatRoomService.Join(userName);
             FrmChatting frmChatting = new FrmChatting(this.CeChatRoomService, userName);
             this.Visible = false;
+
             //frmChatting.ShowDialog();
             frmChatting.Show();
             //this.Dispose();

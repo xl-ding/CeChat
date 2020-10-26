@@ -2,19 +2,35 @@
 using System.Collections.Generic;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using CeChat.Model;
 using CeChat.Service;
-using System.Threading.Tasks;
 
 namespace CeChat.App
 {
     public partial class FrmChatting : Form
     {
+        /// <summary>
+        /// 异步刷新
+        /// </summary>
+        /// <returns>消息列表</returns>
         public delegate IEnumerable<MessageInfo> AsyncRefresh();
 
+        /// <summary>
+        /// 异步离开聊天室
+        /// </summary>
+        /// <param name="userName">用户名</param>
+        public delegate void AsyncLeave(string userName);
+
+        /// <summary>
+        /// 用户名
+        /// </summary>
         public string UserName { get; set; }
 
+        /// <summary>
+        /// 聊天室
+        /// </summary>
         public ICeChatRoomService ChatRoomService { get; set; }
 
         public FrmChatting(ICeChatRoomService chatRoomService, string userName)
@@ -22,7 +38,14 @@ namespace CeChat.App
             InitializeComponent();
             this.ChatRoomService = chatRoomService;
             this.UserName = userName;
+            this.FormClosed += FrmChatting_FormClosed;
             this.RefreshTimer.Start();
+        }
+
+        private async void FrmChatting_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            AsyncLeave asyncLeave = new AsyncLeave(this.ChatRoomService.Leave);
+            await Task.Factory.FromAsync(asyncLeave.BeginInvoke(this.UserName, null, null), asyncLeave.EndInvoke);
         }
 
         public void Init()

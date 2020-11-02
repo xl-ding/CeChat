@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Windows.Forms;
@@ -18,8 +19,8 @@ namespace CeChat.App
             IServiceProvider serviceProvider = ConfigureServices(new ServiceCollection());
 
             // 注册信道
-            TcpChannel tcpChannel = new TcpChannel(0);
-            ChannelServices.RegisterChannel(tcpChannel, false);
+            //TcpChannel tcpChannel = new TcpChannel(0);
+            //ChannelServices.RegisterChannel(tcpChannel, false);
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
@@ -32,8 +33,11 @@ namespace CeChat.App
             services.AddTransient<ICeChatRoomService>(sp =>
             {
                 // todo 创建远程对象
+                RemotingConfiguration.Configure("CeChat.App.exe.config", false);
                 object RemoteObj = Activator.GetObject(typeof(ICeChatRoomService), "tcp://localhost:8989/CeChatRoomService");
                 return (ICeChatRoomService)RemoteObj;
+
+                //return new ICeChatRoomService();
             });
 
             return services.BuildServiceProvider();

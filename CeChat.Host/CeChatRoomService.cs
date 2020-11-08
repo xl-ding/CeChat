@@ -10,7 +10,7 @@ namespace CeChat.Host
         /// <summary>
         /// 消息列表
         /// </summary>
-        private List<MessageInfo> MessageList = new List<MessageInfo>();
+        private readonly List<MessageInfo> _messageList = new List<MessageInfo>();
 
         /// <summary>
         /// 用户列表
@@ -50,7 +50,7 @@ namespace CeChat.Host
         /// <param name="message"></param>
         public void ReceivingMessage(MessageInfo message)
         {
-            this.MessageList.Add(message);
+            this._messageList.Add(message);
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace CeChat.Host
         public IEnumerable<MessageInfo> GetMessages()
         {
             //Thread.Sleep(2000);
-            return this.MessageList;
+            return this._messageList;
         }
     }
 }

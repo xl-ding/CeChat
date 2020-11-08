@@ -62,7 +62,7 @@ namespace CeChat.App
             this.txtMessages.Text = strText.ToString();
         }
 
-        private void BtnSend_Click(object sender, EventArgs e)
+        private async void BtnSend_Click(object sender, EventArgs e)
         {
             string message = this.txtMessage.Text.Trim();
             if (string.IsNullOrWhiteSpace(message))
@@ -75,7 +75,12 @@ namespace CeChat.App
             messageInfo.UserName = this.UserName;
             messageInfo.MessageTime = DateTime.Now;
             messageInfo.MsgContent = message;
-            this.ChatRoomService.ReceivingMessage(messageInfo);
+            Action<MessageInfo> sendMessage = (MessageInfo info) =>
+            {
+                this.ChatRoomService.ReceivingMessage(info);
+            };
+
+            await Task.Factory.FromAsync(sendMessage.BeginInvoke(messageInfo, null, null), sendMessage.EndInvoke);
             this.txtMessage.Text = string.Empty;
         }
 

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using CeChat.Service;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CeChat.App
 {
@@ -33,12 +34,31 @@ namespace CeChat.App
             AsyncJoin asyncJoin = new AsyncJoin(this.CeChatRoomService.Join);
             await Task.Factory.FromAsync(asyncJoin.BeginInvoke(userName, null, null), asyncJoin.EndInvoke);
             //this.CeChatRoomService.Join(userName);
-            FrmChatting frmChatting = new FrmChatting(this.CeChatRoomService, userName);
+            //FrmChatting frmChatting = new FrmChatting(this.CeChatRoomService, userName);
+
+            IServiceProvider serviceProvider = ConfigureServices(new ServiceCollection());
+
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(serviceProvider.GetRequiredService<FrmChatting>());
+
             this.Visible = false;
 
             //frmChatting.ShowDialog();
-            frmChatting.Show();
+            //frmChatting.Show();
             //this.Dispose();
+        }
+
+        public IServiceProvider ConfigureServices(IServiceCollection services)
+        {
+            string userName = this.txtUserName.Text.Trim();
+            services.AddTransient<FrmChatting>();
+            services.AddTransient<ICeChatRoomService,string>(sp =>
+            {
+                return new { this.CeChatRoomService, userName };
+            });
+
+            return services.BuildServiceProvider();
         }
 
         private void TxtUserName_KeyDown(object sender, KeyEventArgs e)

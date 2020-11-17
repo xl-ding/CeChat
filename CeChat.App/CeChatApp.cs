@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using CeChat.Model;
 using CeChat.Service;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -35,17 +36,13 @@ namespace CeChat.App
             await Task.Factory.FromAsync(asyncJoin.BeginInvoke(userName, null, null), asyncJoin.EndInvoke);
             //this.CeChatRoomService.Join(userName);
             //FrmChatting frmChatting = new FrmChatting(this.CeChatRoomService, userName);
-
-            IServiceProvider serviceProvider = ConfigureServices(new ServiceCollection());
-
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(serviceProvider.GetRequiredService<FrmChatting>());
-
-            this.Visible = false;
-
+            //this.Visible = false;
             //frmChatting.ShowDialog();
             //frmChatting.Show();
+
+            IServiceProvider serviceProvider = ConfigureServices(new ServiceCollection());
+            this.Visible = false;
+            serviceProvider.GetRequiredService<FrmChatting>().Show();
             //this.Dispose();
         }
 
@@ -53,9 +50,14 @@ namespace CeChat.App
         {
             string userName = this.txtUserName.Text.Trim();
             services.AddTransient<FrmChatting>();
-            services.AddTransient<ICeChatRoomService,string>(sp =>
+            services.AddTransient<ICeChatRoomService>(sp =>
             {
-                return new { this.CeChatRoomService, userName };
+                return this.CeChatRoomService;
+            });
+
+            services.AddTransient<User>(sp =>
+            {
+                return new User() { UserName = userName };
             });
 
             return services.BuildServiceProvider();

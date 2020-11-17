@@ -33,11 +33,11 @@ namespace CeChat.App
         /// </summary>
         public ICeChatRoomService ChatRoomService { get; set; }
 
-        public FrmChatting(ICeChatRoomService chatRoomService, string userName)
+        public FrmChatting(ICeChatRoomService chatRoomService, User user)
         {
             InitializeComponent();
             this.ChatRoomService = chatRoomService;
-            this.UserName = userName;
+            this.UserName = user.UserName;
             this.FormClosed += FrmChatting_FormClosed;
             this.RefreshTimer.Start();
         }

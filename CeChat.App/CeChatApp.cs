@@ -11,16 +11,19 @@ namespace CeChat.App
     {
         public ICeChatRoomService CeChatRoomService { get; }
 
+        private readonly IServiceProvider service;
+
         /// <summary>
         /// 异步加入
         /// </summary>
         /// <param name="userName">用户名</param>
         public delegate void AsyncJoin(string userName);
 
-        public CeChatApp(ICeChatRoomService ceChatRoomService)
+        public CeChatApp(ICeChatRoomService ceChatRoomService, IServiceProvider service)
         {
             InitializeComponent();
             this.CeChatRoomService = ceChatRoomService;
+            this.service = service;
         }
 
         private async void BtnLogin_Click(object sender, EventArgs e)
@@ -34,16 +37,15 @@ namespace CeChat.App
 
             AsyncJoin asyncJoin = new AsyncJoin(this.CeChatRoomService.Join);
             await Task.Factory.FromAsync(asyncJoin.BeginInvoke(userName, null, null), asyncJoin.EndInvoke);
-            //this.CeChatRoomService.Join(userName);
-            //FrmChatting frmChatting = new FrmChatting(this.CeChatRoomService, userName);
-            //this.Visible = false;
-            //frmChatting.ShowDialog();
-            //frmChatting.Show();
 
-            IServiceProvider serviceProvider = ConfigureServices(new ServiceCollection());
+            // 远程服务User对象赋值
+            User user = service.GetService<User>();
+            user.UserName = userName;
+
             this.Visible = false;
-            serviceProvider.GetRequiredService<FrmChatting>().Show();
-            //this.Dispose();
+
+            // 展示新窗口
+            service.GetRequiredService<FrmChatting>().Show();
         }
 
         public IServiceProvider ConfigureServices(IServiceCollection services)

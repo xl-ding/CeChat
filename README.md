@@ -16,7 +16,7 @@ RPC应用场景：主要针对一些业务量多的应用，通过将一些公�
 
 实现RPC的方式有很多，如Remoting，WebService，MQ等
 
-![RPC框架](img\RPC框架.png)
+![RPC框架](https://github.com/xl-ding/CeChat/blob/master/img/RPCFrame.png)
 
 ### Remoting
 
@@ -215,9 +215,9 @@ Transient(瞬时) ： 每次使用都会创建新的实例；通过 services.Add
 
 具体代码实现，如下图示例：
 
-![创建对象](img\创建容器.png)
+![创建对象](https://github.com/xl-ding/CeChat/blob/master/img/CreateContainer.png)
 
-![注册服务对象](img\注册服务对象.png)
+![注册服务对象](https://github.com/xl-ding/CeChat/blob/master/img/RegisterServer.png)
 
-![容器应用](img\容器应用.png)
+![容器应用](https://github.com/xl-ding/CeChat/blob/master/img/ApplyContainer.png)
 
